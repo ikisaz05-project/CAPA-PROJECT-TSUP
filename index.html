@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>CAPA Management System</title>
+    <title>CAPA Project TSUP</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts - Inter -->
@@ -1012,7 +1012,7 @@
     <div id="loginPage" class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <h1>CAPA System</h1>
+                <h1>CAPA Project TSUP</h1>
                 <p>Corrective Action & Preventive Action</p>
             </div>
             <form id="loginForm">
@@ -1043,7 +1043,7 @@
             <div class="sidebar-header">
                 <i class="fas fa-clipboard-check"></i>
                 <div>
-                    <h2>CAPA System</h2>
+                    <h2>CAPA Project TSUP</h2>
                     <span>v2.0.0</span>
                 </div>
             </div>
@@ -1644,7 +1644,7 @@
         // Run updateDateTime every second
         setInterval(updateDateTime, 1000);
 
-        // Login Handler
+        // Login Handler - FIXED: Bisa dibuka banyak device
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             showLoading();
@@ -1653,6 +1653,7 @@
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
 
+            // Cari user di database
             const user = users.find(u => u.username === username && u.password === password && u.role === role && u.status === 'active');
             
             setTimeout(() => {
@@ -1660,6 +1661,14 @@
                 
                 if (user) {
                     currentUser = user;
+                    
+                    // Simpan ke sessionStorage (bukan localStorage) biar per tab/device beda
+                    sessionStorage.setItem('currentUser', JSON.stringify({
+                        id: user.id,
+                        username: user.username,
+                        role: user.role
+                    }));
+                    
                     document.getElementById('loginPage').style.display = 'none';
                     document.getElementById('app').classList.add('active');
                     document.getElementById('currentUser').textContent = user.username + ' (' + (user.role === 'admin' ? 'Admin' : 'User') + ')';
@@ -1686,6 +1695,36 @@
                 }
             }, 500); // Simulasi loading
         });
+
+        // Cek sessionStorage saat halaman dimuat (untuk reload)
+        function checkSavedSession() {
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                const userData = JSON.parse(savedUser);
+                currentUser = users.find(u => u.id === userData.id);
+                
+                if (currentUser) {
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('app').classList.add('active');
+                    document.getElementById('currentUser').textContent = currentUser.username + ' (' + (currentUser.role === 'admin' ? 'Admin' : 'User') + ')';
+                    
+                    if (currentUser.role === 'admin') {
+                        document.getElementById('adminMenu').style.display = 'block';
+                    } else {
+                        document.getElementById('adminMenu').style.display = 'none';
+                    }
+                    
+                    updateMachineFilter();
+                    applyFilters();
+                    renderTables();
+                    renderUsersTable();
+                    updateDateTime();
+                }
+            }
+        }
+
+        // Panggil saat halaman dimuat
+        checkSavedSession();
 
         // Mobile menu toggle
         document.getElementById('menuToggle').addEventListener('click', function() {
@@ -2410,9 +2449,10 @@
             }
         }
 
-        // Logout
+        // Logout - HAPUS sessionStorage
         function logout() {
             if (confirm('Yakin ingin logout?')) {
+                sessionStorage.removeItem('currentUser');
                 currentUser = null;
                 document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('app').classList.remove('active');
