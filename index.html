@@ -171,7 +171,100 @@
             transform: translateY(-2px);
         }
 
-        /* Main App Styles */
+        /* Forgot Password Link */
+        .forgot-password {
+            text-align: right;
+            margin: 0.5rem 0 1.5rem 0;
+        }
+
+        .forgot-password a {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* Reset Password Section */
+        .reset-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .reset-section.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reset-section h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .reset-btn:hover {
+            background: #e07b39;
+            transform: translateY(-2px);
+        }
+
+        .reset-btn.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            margin-top: 0;
+        }
+
+        .reset-btn.secondary:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Info Box */
+        .info-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .info-box i {
+            color: var(--accent-color);
+            margin-right: 8px;
+        }
+
+        /* Main App Styles (sama seperti sebelumnya) */
         .app-container {
             display: none;
             min-height: 100vh;
@@ -1007,14 +1100,16 @@
                 <h1>CAPA Project TSUP</h1>
                 <p>Corrective Action & Preventive Action</p>
             </div>
+            
+            <!-- Form Login -->
             <form id="loginForm">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="username" placeholder="Masukkan username" value="admin" required>
+                    <input type="text" id="username" placeholder="Masukkan username" required>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="password" placeholder="Masukkan password" value="123456" required>
+                    <input type="password" id="password" placeholder="Masukkan password" required>
                 </div>
                 <div class="form-group">
                     <label>Login sebagai</label>
@@ -1023,25 +1118,52 @@
                         <option value="user">User</option>
                     </select>
                 </div>
+                
+                <!-- Forgot Password Link -->
+                <div class="forgot-password">
+                    <a onclick="showResetSection()">Lupa Password?</a>
+                </div>
+                
                 <button type="submit" class="login-btn">Login</button>
             </form>
             
-            <!-- Informasi Akun -->
-            <div style="margin-top: 20px; padding: 15px; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-color);">
-                <p style="margin-bottom: 8px; font-weight: 600; color: var(--accent-color);">🔐 Informasi Akun:</p>
-                <p style="margin-bottom: 5px; font-size: 0.9rem;">👤 <strong>Admin:</strong> admin / 123456</p>
-                <p style="margin-bottom: 5px; font-size: 0.9rem;">👤 <strong>User:</strong> user / user123</p>
-                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary);">⚠️ Jika lupa password, klik tombol reset di bawah</p>
+            <!-- Reset Password Section (Hidden by default) -->
+            <div id="resetSection" class="reset-section">
+                <h3>Reset Password</h3>
+                <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-secondary);">Pilih akun yang akan direset:</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <button class="reset-btn secondary" onclick="resetPassword('admin')">
+                        <i class="fas fa-user-shield"></i> Reset Password Admin
+                    </button>
+                    <button class="reset-btn secondary" onclick="resetPassword('user')">
+                        <i class="fas fa-user"></i> Reset Password User
+                    </button>
+                </div>
+                
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Password akan direset ke default: <strong>123456</strong> untuk Admin, <strong>user123</strong> untuk User</span>
+                </div>
+                
+                <button class="reset-btn" onclick="hideResetSection()" style="margin-top: 15px;">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Login
+                </button>
             </div>
             
-            <!-- Tombol Reset Password -->
-            <button type="button" onclick="resetAdminPassword()" style="width: 100%; margin-top: 15px; padding: 10px; background: var(--warning); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <i class="fas fa-key"></i> Reset Password Admin ke 123456
-            </button>
+            <!-- Informasi Akun (Tanpa Password) -->
+            <div style="margin-top: 20px; padding: 15px; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-color);">
+                <p style="margin-bottom: 8px; font-weight: 600; color: var(--accent-color);">📋 Informasi Akun:</p>
+                <p style="margin-bottom: 5px; font-size: 0.9rem;">👤 <strong>Admin:</strong> admin</p>
+                <p style="margin-bottom: 5px; font-size: 0.9rem;">👤 <strong>User:</strong> user</p>
+                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary);">
+                    <i class="fas fa-key"></i> Lupa password? Klik "Lupa Password" di atas
+                </p>
+            </div>
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- Main App (sama seperti sebelumnya) -->
     <div id="app" class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -1483,7 +1605,7 @@
     </div>
 
     <script>
-        // Data awal - UBAH PASSWORD ADMIN JADI 123456
+        // Data awal
         let users = [
             { id: 1, username: 'admin', password: '123456', role: 'admin', status: 'active' },
             { id: 2, username: 'user', password: 'user123', role: 'user', status: 'active' }
@@ -1649,22 +1771,39 @@
         // Run updateDateTime every second
         setInterval(updateDateTime, 1000);
 
-        // FUNGSI BARU: Reset password admin ke 123456
-        function resetAdminPassword() {
-            if (confirm('Reset password admin ke 123456?')) {
-                // Cari user admin
-                const admin = users.find(u => u.id === 1);
-                if (admin) {
-                    admin.password = '123456';
-                    saveUsers();
-                    alert('✅ Password admin telah direset ke 123456');
-                    
-                    // Isi otomatis form login
-                    document.getElementById('username').value = 'admin';
-                    document.getElementById('password').value = '123456';
-                    document.getElementById('role').value = 'admin';
+        // FUNGSI RESET PASSWORD - User bisa reset sendiri
+        function showResetSection() {
+            document.getElementById('resetSection').classList.add('active');
+        }
+
+        function hideResetSection() {
+            document.getElementById('resetSection').classList.remove('active');
+        }
+
+        function resetPassword(role) {
+            showLoading();
+            
+            setTimeout(() => {
+                if (role === 'admin') {
+                    const admin = users.find(u => u.id === 1);
+                    if (admin) {
+                        admin.password = '123456';
+                        saveUsers();
+                        hideLoading();
+                        alert('✅ Password Admin telah direset ke 123456');
+                    }
+                } else if (role === 'user') {
+                    const user = users.find(u => u.id === 2);
+                    if (user) {
+                        user.password = 'user123';
+                        saveUsers();
+                        hideLoading();
+                        alert('✅ Password User telah direset ke user123');
+                    }
                 }
-            }
+                
+                hideResetSection();
+            }, 500);
         }
 
         // Login Handler
@@ -1720,7 +1859,7 @@
                     updateDateTime();
                 } else {
                     console.log('Login failed: user not found');
-                    alert('Username atau password salah!\n\nAdmin: admin / 123456\nUser: user / user123');
+                    alert('Username atau password salah!');
                 }
             }, 500);
         });
