@@ -759,6 +759,47 @@
             color: var(--danger);
         }
 
+        /* Progress Bar Styles */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 100px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.completed {
+            background: var(--success);
+        }
+
+        .progress-fill.pending {
+            background: var(--warning);
+        }
+
+        .progress-fill.overdue {
+            background: var(--danger);
+        }
+
+        .progress-text {
+            font-weight: 600;
+            min-width: 45px;
+            text-align: right;
+        }
+
         .action-btn {
             padding: 0.5rem;
             background: var(--bg-primary);
@@ -1054,6 +1095,10 @@
                 width: 100%;
                 margin: 0.1rem 0;
             }
+            
+            .progress-container {
+                min-width: 80px;
+            }
         }
 
         /* Landscape mode untuk HP */
@@ -1093,7 +1138,7 @@
     <!-- Loading Spinner -->
     <div class="loading-spinner" id="loadingSpinner"></div>
 
-    <!-- Login Page -->
+    <!-- Login Page (INFO AKUN SUDAH DIHAPUS) -->
     <div id="loginPage" class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -1143,22 +1188,12 @@
                 
                 <div class="info-box">
                     <i class="fas fa-info-circle"></i>
-                    <span>Password akan direset ke default: <strong>123456</strong> untuk Admin, <strong>user123</strong> untuk User</span>
+                    <span>Password akan direset ke default</span>
                 </div>
                 
                 <button class="reset-btn" onclick="hideResetSection()" style="margin-top: 15px;">
                     <i class="fas fa-arrow-left"></i> Kembali ke Login
                 </button>
-            </div>
-            
-            <!-- Informasi Akun (Tanpa Password) -->
-            <div style="margin-top: 20px; padding: 15px; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-color);">
-                <p style="margin-bottom: 8px; font-weight: 600; color: var(--accent-color);">📋 Informasi Akun:</p>
-                <p style="margin-bottom: 5px; font-size: 0.9rem;">👤 <strong>Admin:</strong> admin</p>
-                <p style="margin-bottom: 5px; font-size: 0.9rem;">👤 <strong>User:</strong> user</p>
-                <p style="margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary);">
-                    <i class="fas fa-key"></i> Lupa password? Klik "Lupa Password" di atas
-                </p>
             </div>
         </div>
     </div>
@@ -1383,7 +1418,7 @@
                     </div>
                 </div>
 
-                <!-- Tabel Data CAPA Terkini -->
+                <!-- Tabel Data CAPA Terkini dengan Progress Bar -->
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Data CAPA Terkini</h3>
@@ -1605,8 +1640,7 @@
     </div>
 
     <script>
-        // ========== PERBAIKAN UTAMA ==========
-        // HAPUS deklarasi users default, langsung load dari localStorage!
+        // ========== DATA INITIALIZATION ==========
         let users = [];
         let capaData = [];
 
@@ -2095,7 +2129,7 @@
             document.getElementById('dueDate').valueAsDate = new Date(new Date().setDate(new Date().getDate() + 7));
         }
 
-        // Render Tables
+        // Render Tables dengan Progress Bar
         function renderTables() {
             const tableBody = document.getElementById('tableBody');
             const progressBody = document.getElementById('progressTableBody');
@@ -2116,7 +2150,17 @@
                 const statusText = item.status === 'completed' ? 'Completed' :
                                   (dueDate < today && item.status !== 'completed' ? 'Overdue' : 'Pending');
                 
-                // Tabel Dashboard dengan Corrective & Preventive
+                // Tentukan warna progress bar
+                let progressBarClass = '';
+                if (item.status === 'completed') {
+                    progressBarClass = 'completed';
+                } else if (dueDate < today && item.status !== 'completed') {
+                    progressBarClass = 'overdue';
+                } else {
+                    progressBarClass = 'pending';
+                }
+                
+                // Tabel Dashboard dengan Progress Bar
                 tableHtml += `
                     <tr>
                         <td>${item.line}</td>
@@ -2126,7 +2170,14 @@
                         <td>${item.preventive}</td>
                         <td>${item.dueDate}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td>${item.progress}%</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill ${progressBarClass}" style="width: ${item.progress}%"></div>
+                                </div>
+                                <span class="progress-text">${item.progress}%</span>
+                            </div>
+                        </td>
                         <td class="action-cell">
                             ${currentUser?.role === 'admin' ? 
                                 `<button class="action-btn" onclick="editData(${item.id})"><i class="fas fa-edit"></i></button>
@@ -2146,9 +2197,11 @@
                         <td>${item.corrective}</td>
                         <td>${item.dueDate}</td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <progress value="${item.progress}" max="100" style="width: 80px;"></progress>
-                                <span>${item.progress}%</span>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill ${progressBarClass}" style="width: ${item.progress}%"></div>
+                                </div>
+                                <span class="progress-text">${item.progress}%</span>
                             </div>
                         </td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
