@@ -623,6 +623,89 @@
             gap: 0.25rem;
         }
 
+        /* Status Cards dengan Persentase - TAMBAHAN BARU */
+        .status-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-section h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            padding: 1.5rem;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .status-card.closed { background: #10b981; }
+        .status-card.pending { background: #f59e0b; }
+        .status-card.overdue { background: #ef4444; }
+
+        .status-card .label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-card .count {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-card .percentage {
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem;
+            border-radius: 20px;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .progress-container-status {
+            margin-top: 1rem;
+        }
+
+        .progress-bar-status {
+            display: flex;
+            height: 30px;
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: width 0.3s ease;
+        }
+
+        .segment-closed { background: #10b981; }
+        .segment-pending { background: #f59e0b; }
+        .segment-overdue { background: #ef4444; }
+
         /* Charts Container */
         .charts-container {
             display: grid;
@@ -1012,6 +1095,10 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
             
             .table-container {
                 padding: 1rem;
@@ -1114,6 +1201,10 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .status-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         /* Print styles */
@@ -1138,7 +1229,7 @@
     <!-- Loading Spinner -->
     <div class="loading-spinner" id="loadingSpinner"></div>
 
-    <!-- Login Page (INFO AKUN SUDAH DIHAPUS) -->
+    <!-- Login Page -->
     <div id="loginPage" class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -1172,7 +1263,7 @@
                 <button type="submit" class="login-btn">Login</button>
             </form>
             
-            <!-- Reset Password Section (Hidden by default) -->
+            <!-- Reset Password Section -->
             <div id="resetSection" class="reset-section">
                 <h3>Reset Password</h3>
                 <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-secondary);">Pilih akun yang akan direset:</p>
@@ -1388,6 +1479,44 @@
                     </div>
                 </div>
 
+                <!-- ===== STATUS CAPA DENGAN PERSENTASE (YANG KAMU MINTA) ===== -->
+                <div class="status-section">
+                    <h3><i class="fas fa-chart-pie" style="margin-right: 10px; color: var(--accent-color);"></i>Status CAPA</h3>
+                    
+                    <!-- 3 Cards Status dengan Persentase -->
+                    <div class="status-grid">
+                        <!-- Closed Card -->
+                        <div class="status-card closed">
+                            <div class="label">Closed</div>
+                            <div class="count" id="closedCount">0</div>
+                            <div class="percentage" id="closedPercent">0%</div>
+                        </div>
+                        
+                        <!-- Pending Card -->
+                        <div class="status-card pending">
+                            <div class="label">Pending</div>
+                            <div class="count" id="pendingCount">0</div>
+                            <div class="percentage" id="pendingPercent">0%</div>
+                        </div>
+                        
+                        <!-- Overdue Card -->
+                        <div class="status-card overdue">
+                            <div class="label">Overdue</div>
+                            <div class="count" id="overdueCount">0</div>
+                            <div class="percentage" id="overduePercent">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-container-status">
+                        <div class="progress-bar-status">
+                            <div class="progress-segment segment-closed" id="progressClosed" style="width: 0%">0%</div>
+                            <div class="progress-segment segment-pending" id="progressPending" style="width: 0%">0%</div>
+                            <div class="progress-segment segment-overdue" id="progressOverdue" style="width: 0%">0%</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Charts -->
                 <div class="charts-container">
                     <div class="chart-card">
@@ -1418,7 +1547,7 @@
                     </div>
                 </div>
 
-                <!-- Tabel Data CAPA Terkini dengan Progress Bar -->
+                <!-- Tabel Data CAPA Terkini -->
                 <div class="table-container">
                     <div class="table-header">
                         <h3>Data CAPA Terkini</h3>
@@ -1650,7 +1779,6 @@
             const savedUsers = localStorage.getItem('capaUsers');
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
-                console.log('Loaded users from localStorage:', users);
             } else {
                 // Kalau belum ada, buat default
                 users = [
@@ -1658,14 +1786,12 @@
                     { id: 2, username: 'user', password: 'user123', role: 'user', status: 'active' }
                 ];
                 saveUsers();
-                console.log('Created default users:', users);
             }
 
             // Load CAPA data dari localStorage
             const savedData = localStorage.getItem('capaData');
             if (savedData) {
                 capaData = JSON.parse(savedData);
-                console.log('Loaded CAPA data from localStorage:', capaData.length, 'records');
             } else {
                 // Kalau belum ada, buat default
                 capaData = [
@@ -1720,36 +1846,9 @@
                         dueDate: '2024-02-22',
                         progress: 25,
                         status: 'pending'
-                    },
-                    {
-                        id: 5,
-                        line: 'Line 01',
-                        machine: 'Mesin Injection B',
-                        date: '2024-03-05',
-                        problem: 'Kebocoran oli',
-                        rootCause: 'Seal aus',
-                        corrective: 'Ganti seal',
-                        preventive: 'Cek seal bulanan',
-                        dueDate: '2024-03-10',
-                        progress: 75,
-                        status: 'pending'
-                    },
-                    {
-                        id: 6,
-                        line: 'Line 05',
-                        machine: 'Pneumatic System E',
-                        date: '2024-03-08',
-                        problem: 'Tekanan udara turun',
-                        rootCause: 'Filter kotor',
-                        corrective: 'Bersihkan filter',
-                        preventive: 'Bersihkan filter setiap minggu',
-                        dueDate: '2024-03-12',
-                        progress: 10,
-                        status: 'pending'
                     }
                 ];
                 saveCapaData();
-                console.log('Created default CAPA data:', capaData.length, 'records');
             }
         }
 
@@ -1759,18 +1858,17 @@
         // Save users to localStorage
         function saveUsers() {
             localStorage.setItem('capaUsers', JSON.stringify(users));
-            console.log('Users saved to localStorage');
         }
 
         // Save CAPA data to localStorage
         function saveCapaData() {
             localStorage.setItem('capaData', JSON.stringify(capaData));
-            console.log('CAPA data saved to localStorage');
         }
 
         let currentUser = null;
         let currentTheme = 'light';
         let editingUserId = null;
+        let progressChart, statusChart;
         let currentFilters = {
             line: 'all',
             machine: 'all',
@@ -1791,14 +1889,12 @@
         function updateDateTime() {
             const now = new Date();
             
-            // Format tanggal: DD/MM/YYYY
             const dateStr = now.toLocaleDateString('id-ID', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric'
             }).replace(/\//g, '/');
             
-            // Format waktu: HH:MM:SS
             const timeStr = now.toLocaleTimeString('id-ID', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -1810,7 +1906,6 @@
             document.getElementById('currentTime').textContent = timeStr;
         }
 
-        // Run updateDateTime every second
         setInterval(updateDateTime, 1000);
 
         // FUNGSI RESET PASSWORD
@@ -1857,21 +1952,14 @@
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
 
-            // Debug: lihat data users di console
-            console.log('Login attempt:', username, password, role);
-            console.log('Available users:', users);
-
-            // Cari user di database
             const user = users.find(u => u.username === username && u.password === password && u.role === role && u.status === 'active');
             
             setTimeout(() => {
                 hideLoading();
                 
                 if (user) {
-                    console.log('Login success:', user);
                     currentUser = user;
                     
-                    // Simpan ke sessionStorage
                     sessionStorage.setItem('currentUser', JSON.stringify({
                         id: user.id,
                         username: user.username,
@@ -1882,25 +1970,18 @@
                     document.getElementById('app').classList.add('active');
                     document.getElementById('currentUser').textContent = user.username + ' (' + (user.role === 'admin' ? 'Admin' : 'User') + ')';
                     
-                    // Tampilkan menu admin jika role admin
                     if (user.role === 'admin') {
                         document.getElementById('adminMenu').style.display = 'block';
                     } else {
                         document.getElementById('adminMenu').style.display = 'none';
                     }
                     
-                    // Update machine dropdown
                     updateMachineFilter();
-                    
-                    // Apply filters and update display
                     applyFilters();
                     renderTables();
                     renderUsersTable();
-                    
-                    // Update datetime immediately
                     updateDateTime();
                 } else {
-                    console.log('Login failed: user not found');
                     alert('Username atau password salah!\n\nGunakan fitur "Lupa Password" jika lupa password.');
                 }
             }, 500);
@@ -1933,7 +2014,6 @@
             }
         }
 
-        // Panggil saat halaman dimuat
         checkSavedSession();
 
         // Mobile menu toggle
@@ -1965,7 +2045,6 @@
             const lineFilter = document.getElementById('filterLine').value;
             const machineSelect = document.getElementById('filterMachine');
             
-            // Get unique machines from data
             let machines = ['all'];
             let filteredData = capaData;
             
@@ -1976,7 +2055,6 @@
             const uniqueMachines = [...new Set(filteredData.map(item => item.machine))];
             machines = machines.concat(uniqueMachines);
             
-            // Update machine dropdown
             machineSelect.innerHTML = machines.map(machine => 
                 `<option value="${machine}">${machine === 'all' ? 'Semua Mesin' : machine}</option>`
             ).join('');
@@ -1985,17 +2063,14 @@
         // Filter functions
         function getFilteredData() {
             return capaData.filter(item => {
-                // Filter by line
                 if (currentFilters.line !== 'all' && item.line !== currentFilters.line) {
                     return false;
                 }
                 
-                // Filter by machine
                 if (currentFilters.machine !== 'all' && item.machine !== currentFilters.machine) {
                     return false;
                 }
                 
-                // Filter by month
                 if (currentFilters.month !== 'all') {
                     const itemMonth = item.date.split('-')[1];
                     if (itemMonth !== currentFilters.month) {
@@ -2049,7 +2124,6 @@
                 currentTheme = 'light';
             }
             
-            // Update charts with new theme
             updateCharts();
         }
 
@@ -2059,15 +2133,12 @@
                 e.preventDefault();
                 const page = this.dataset.page;
                 
-                // Update active class
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
                 
-                // Show selected page
                 document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
                 document.getElementById(page + 'Page').style.display = 'block';
                 
-                // Update page title
                 const titles = {
                     'dashboard': 'Dashboard',
                     'input': 'Input CAPA',
@@ -2082,7 +2153,6 @@
                     renderUsersTable();
                 }
                 
-                // Close sidebar on mobile after navigation
                 if (window.innerWidth <= 768) {
                     document.getElementById('sidebar').classList.remove('active');
                     document.getElementById('menuToggle').querySelector('i').className = 'fas fa-bars';
@@ -2117,7 +2187,6 @@
                 hideLoading();
                 alert('Data berhasil disimpan!');
                 
-                // Pindah ke halaman dashboard
                 document.querySelector('[data-page="dashboard"]').click();
             }, 500);
         });
@@ -2129,7 +2198,7 @@
             document.getElementById('dueDate').valueAsDate = new Date(new Date().setDate(new Date().getDate() + 7));
         }
 
-        // Render Tables dengan Progress Bar
+        // Render Tables
         function renderTables() {
             const tableBody = document.getElementById('tableBody');
             const progressBody = document.getElementById('progressTableBody');
@@ -2150,7 +2219,6 @@
                 const statusText = item.status === 'completed' ? 'Completed' :
                                   (dueDate < today && item.status !== 'completed' ? 'Overdue' : 'Pending');
                 
-                // Tentukan warna progress bar
                 let progressBarClass = '';
                 if (item.status === 'completed') {
                     progressBarClass = 'completed';
@@ -2160,7 +2228,6 @@
                     progressBarClass = 'pending';
                 }
                 
-                // Tabel Dashboard dengan Progress Bar
                 tableHtml += `
                     <tr>
                         <td>${item.line}</td>
@@ -2188,7 +2255,6 @@
                     </tr>
                 `;
                 
-                // Tabel Progress
                 progressHtml += `
                     <tr>
                         <td>${item.line}</td>
@@ -2215,6 +2281,13 @@
                 `;
             });
             
+            if (tableHtml === '') {
+                tableHtml = '<tr><td colspan="9" style="text-align: center; padding: 2rem;">Tidak ada data</td></tr>';
+            }
+            if (progressHtml === '') {
+                progressHtml = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">Tidak ada data</td></tr>';
+            }
+            
             tableBody.innerHTML = tableHtml;
             progressBody.innerHTML = progressHtml;
             
@@ -2224,6 +2297,8 @@
         // Render Users Table
         function renderUsersTable() {
             const usersBody = document.getElementById('usersTableBody');
+            if (!usersBody) return;
+            
             let usersHtml = '';
             
             users.forEach(user => {
@@ -2287,7 +2362,6 @@
             
             setTimeout(() => {
                 if (editingUserId) {
-                    // Edit existing user
                     const user = users.find(u => u.id === editingUserId);
                     if (user) {
                         user.username = username;
@@ -2295,7 +2369,6 @@
                         user.role = role;
                     }
                 } else {
-                    // Add new user
                     const newUser = {
                         id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
                         username: username,
@@ -2369,16 +2442,47 @@
             document.getElementById('overdueCapa').textContent = overdue;
             document.getElementById('closedPercentage').textContent = total > 0 ? Math.round((closed/total)*100) + '%' : '0%';
             
+            // Update STATUS CARDS dengan PERSENTASE
+            document.getElementById('closedCount').textContent = closed;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('overdueCount').textContent = overdue;
+            
+            if (total > 0) {
+                const closedPercent = Math.round((closed/total)*100);
+                const pendingPercent = Math.round((pending/total)*100);
+                const overduePercent = Math.round((overdue/total)*100);
+                
+                document.getElementById('closedPercent').textContent = closedPercent + '%';
+                document.getElementById('pendingPercent').textContent = pendingPercent + '%';
+                document.getElementById('overduePercent').textContent = overduePercent + '%';
+                
+                // Update progress bar
+                document.getElementById('progressClosed').style.width = (closed/total)*100 + '%';
+                document.getElementById('progressClosed').textContent = closedPercent + '%';
+                document.getElementById('progressPending').style.width = (pending/total)*100 + '%';
+                document.getElementById('progressPending').textContent = pendingPercent + '%';
+                document.getElementById('progressOverdue').style.width = (overdue/total)*100 + '%';
+                document.getElementById('progressOverdue').textContent = overduePercent + '%';
+            } else {
+                document.getElementById('closedPercent').textContent = '0%';
+                document.getElementById('pendingPercent').textContent = '0%';
+                document.getElementById('overduePercent').textContent = '0%';
+                
+                document.getElementById('progressClosed').style.width = '0%';
+                document.getElementById('progressClosed').textContent = '0%';
+                document.getElementById('progressPending').style.width = '0%';
+                document.getElementById('progressPending').textContent = '0%';
+                document.getElementById('progressOverdue').style.width = '0%';
+                document.getElementById('progressOverdue').textContent = '0%';
+            }
+            
             updateCharts();
         }
 
         // Charts
-        let progressChart, statusChart;
-
         function updateCharts() {
             const filteredData = getFilteredData();
             
-            // Data per line
             const lines = ['Line 01', 'Line 02', 'Line 03', 'Line 04', 'Line 05', 'Line 06', 'Line 07', 'Line 08', 'Line 09'];
             const lineProgress = lines.map(line => {
                 const items = filteredData.filter(item => item.line === line);
@@ -2386,7 +2490,6 @@
                 return Math.round(items.reduce((sum, item) => sum + item.progress, 0) / items.length);
             });
 
-            // Data status
             const total = filteredData.length;
             const closed = filteredData.filter(item => item.status === 'completed').length;
             const pending = filteredData.filter(item => item.status === 'pending').length;
@@ -2397,127 +2500,69 @@
                 return dueDate < today && item.status !== 'completed';
             }).length;
 
-            // Destroy existing charts
             if (progressChart) progressChart.destroy();
             if (statusChart) statusChart.destroy();
 
-            // Create progress chart
-            const ctx1 = document.getElementById('progressChart').getContext('2d');
-            progressChart = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: lines,
-                    datasets: [{
-                        label: 'Progress (%)',
-                        data: lineProgress,
-                        backgroundColor: 'rgba(37, 99, 235, 0.8)',
-                        borderRadius: 6,
-                        barPercentage: 0.6,
-                        categoryPercentage: 0.8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Progress: ' + context.raw + '%';
-                                }
-                            }
-                        }
+            const ctx1 = document.getElementById('progressChart')?.getContext('2d');
+            if (ctx1) {
+                progressChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: lines,
+                        datasets: [{
+                            label: 'Progress (%)',
+                            data: lineProgress,
+                            backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: {
-                                color: 'var(--chart-grid)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                stepSize: 20,
-                                callback: function(value) {
-                                    return value + '%';
-                                }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { callback: (value) => value + '%' }
                             }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45,
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        }
-                    },
-                    layout: {
-                        padding: {
-                            top: 10,
-                            bottom: 10
                         }
                     }
-                }
-            });
+                });
+            }
 
-            // Create status chart
-            const ctx2 = document.getElementById('statusChart').getContext('2d');
-            statusChart = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Closed', 'Pending', 'Overdue'],
-                    datasets: [{
-                        data: [closed, pending, overdue],
-                        backgroundColor: [
-                            '#10b981',
-                            '#f59e0b',
-                            '#ef4444'
-                        ],
-                        borderWidth: 0,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 15,
-                                font: {
-                                    size: 11
+            const ctx2 = document.getElementById('statusChart')?.getContext('2d');
+            if (ctx2) {
+                statusChart = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Closed', 'Pending', 'Overdue'],
+                        datasets: [{
+                            data: [closed, pending, overdue],
+                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => {
+                                        const value = context.raw;
+                                        const percentage = total > 0 ? Math.round((value/total)*100) : 0;
+                                        return context.label + ': ' + value + ' (' + percentage + '%)';
+                                    }
                                 }
                             }
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.raw;
-                                    const percentage = total > 0 ? Math.round((value/total)*100) : 0;
-                                    return context.label + ': ' + value + ' (' + percentage + '%)';
-                                }
-                            }
-                        }
-                    },
-                    cutout: '65%',
-                    layout: {
-                        padding: {
-                            top: 10,
-                            bottom: 10
-                        }
+                        cutout: '65%'
                     }
-                }
-            });
+                });
+            }
         }
 
         // Export functions
@@ -2526,9 +2571,7 @@
             
             setTimeout(() => {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'landscape'
-                });
+                const doc = new jsPDF({ orientation: 'landscape' });
                 
                 doc.text('Data CAPA', 14, 16);
                 
@@ -2549,12 +2592,7 @@
                     body: tableData,
                     startY: 20,
                     theme: 'grid',
-                    styles: { fontSize: 8 },
-                    columnStyles: {
-                        2: { cellWidth: 40 },
-                        3: { cellWidth: 40 },
-                        4: { cellWidth: 40 }
-                    }
+                    styles: { fontSize: 8 }
                 });
                 
                 doc.save('capa-data.pdf');
@@ -2568,7 +2606,6 @@
             setTimeout(() => {
                 const filteredData = getFilteredData();
                 
-                // Prepare data for CSV
                 const csvData = filteredData.map(item => ({
                     'Line': item.line,
                     'Mesin': item.machine,
@@ -2613,7 +2650,6 @@
             document.getElementById('updateModal').classList.remove('active');
         }
 
-        // Update form submit
         document.getElementById('updateForm').addEventListener('submit', function(e) {
             e.preventDefault();
             showLoading();
@@ -2697,11 +2733,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             resetForm();
-            
-            // Set default theme
             document.documentElement.setAttribute('data-theme', 'light');
-            
-            // Initialize datetime
             updateDateTime();
         });
 
