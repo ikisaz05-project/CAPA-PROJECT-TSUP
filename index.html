@@ -623,7 +623,7 @@
             gap: 0.25rem;
         }
 
-        /* Status Cards dengan Persentase - TAMBAHAN BARU */
+        /* Status Cards dengan Persentase */
         .status-section {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -1275,11 +1275,17 @@
                     <button class="reset-btn secondary" onclick="resetPassword('user')">
                         <i class="fas fa-user"></i> Reset Password User
                     </button>
+                    <button class="reset-btn secondary" onclick="resetPassword('firdha')">
+                        <i class="fas fa-user"></i> Reset Password FIRDHA
+                    </button>
+                    <button class="reset-btn secondary" onclick="resetPassword('abet')">
+                        <i class="fas fa-user"></i> Reset Password ABET
+                    </button>
                 </div>
                 
                 <div class="info-box">
                     <i class="fas fa-info-circle"></i>
-                    <span>Password akan direset ke default</span>
+                    <span>Password akan direset ke default (firdha123 / abet123)</span>
                 </div>
                 
                 <button class="reset-btn" onclick="hideResetSection()" style="margin-top: 15px;">
@@ -1479,7 +1485,7 @@
                     </div>
                 </div>
 
-                <!-- ===== STATUS CAPA DENGAN PERSENTASE (YANG KAMU MINTA) ===== -->
+                <!-- ===== STATUS CAPA DENGAN PERSENTASE ===== -->
                 <div class="status-section">
                     <h3><i class="fas fa-chart-pie" style="margin-right: 10px; color: var(--accent-color);"></i>Status CAPA</h3>
                     
@@ -1779,19 +1785,24 @@
             const savedUsers = localStorage.getItem('capaUsers');
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
+                console.log('Loaded users from localStorage:', users);
             } else {
-                // Kalau belum ada, buat default
+                // Kalau belum ada, buat default dengan FIRDHA & ABET
                 users = [
                     { id: 1, username: 'admin', password: '123456', role: 'admin', status: 'active' },
-                    { id: 2, username: 'user', password: 'user123', role: 'user', status: 'active' }
+                    { id: 2, username: 'user', password: 'user123', role: 'user', status: 'active' },
+                    { id: 3, username: 'FIRDHA', password: 'firdha123', role: 'user', status: 'active' },
+                    { id: 4, username: 'ABET', password: 'abet123', role: 'user', status: 'active' }
                 ];
                 saveUsers();
+                console.log('Created default users with FIRDHA & ABET:', users);
             }
 
             // Load CAPA data dari localStorage
             const savedData = localStorage.getItem('capaData');
             if (savedData) {
                 capaData = JSON.parse(savedData);
+                console.log('Loaded CAPA data from localStorage:', capaData.length, 'records');
             } else {
                 // Kalau belum ada, buat default
                 capaData = [
@@ -1849,6 +1860,7 @@
                     }
                 ];
                 saveCapaData();
+                console.log('Created default CAPA data:', capaData.length, 'records');
             }
         }
 
@@ -1858,11 +1870,13 @@
         // Save users to localStorage
         function saveUsers() {
             localStorage.setItem('capaUsers', JSON.stringify(users));
+            console.log('Users saved to localStorage');
         }
 
         // Save CAPA data to localStorage
         function saveCapaData() {
             localStorage.setItem('capaData', JSON.stringify(capaData));
+            console.log('CAPA data saved to localStorage');
         }
 
         let currentUser = null;
@@ -1937,6 +1951,22 @@
                         hideLoading();
                         alert('✅ Password User telah direset ke user123');
                     }
+                } else if (role === 'firdha') {
+                    const firdha = users.find(u => u.username === 'FIRDHA');
+                    if (firdha) {
+                        firdha.password = 'firdha123';
+                        saveUsers();
+                        hideLoading();
+                        alert('✅ Password FIRDHA telah direset ke firdha123');
+                    }
+                } else if (role === 'abet') {
+                    const abet = users.find(u => u.username === 'ABET');
+                    if (abet) {
+                        abet.password = 'abet123';
+                        saveUsers();
+                        hideLoading();
+                        alert('✅ Password ABET telah direset ke abet123');
+                    }
                 }
                 
                 hideResetSection();
@@ -1952,14 +1982,25 @@
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
 
-            const user = users.find(u => u.username === username && u.password === password && u.role === role && u.status === 'active');
+            console.log('Login attempt:', username, password, role);
+            console.log('Available users:', users);
+
+            // Cari user di database (case insensitive untuk username)
+            const user = users.find(u => 
+                u.username.toUpperCase() === username.toUpperCase() && 
+                u.password === password && 
+                u.role === role && 
+                u.status === 'active'
+            );
             
             setTimeout(() => {
                 hideLoading();
                 
                 if (user) {
+                    console.log('Login success:', user);
                     currentUser = user;
                     
+                    // Simpan ke sessionStorage
                     sessionStorage.setItem('currentUser', JSON.stringify({
                         id: user.id,
                         username: user.username,
@@ -1982,6 +2023,7 @@
                     renderUsersTable();
                     updateDateTime();
                 } else {
+                    console.log('Login failed: user not found');
                     alert('Username atau password salah!\n\nGunakan fitur "Lupa Password" jika lupa password.');
                 }
             }, 500);
@@ -2456,7 +2498,6 @@
                 document.getElementById('pendingPercent').textContent = pendingPercent + '%';
                 document.getElementById('overduePercent').textContent = overduePercent + '%';
                 
-                // Update progress bar
                 document.getElementById('progressClosed').style.width = (closed/total)*100 + '%';
                 document.getElementById('progressClosed').textContent = closedPercent + '%';
                 document.getElementById('progressPending').style.width = (pending/total)*100 + '%';
