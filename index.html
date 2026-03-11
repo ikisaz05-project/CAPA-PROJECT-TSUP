@@ -1285,7 +1285,7 @@
                 
                 <div class="info-box">
                     <i class="fas fa-info-circle"></i>
-                    <span>Password akan direset ke default (firdha123 / abet123)</span>
+                    <span>Password akan direset ke default</span>
                 </div>
                 
                 <button class="reset-btn" onclick="hideResetSection()" style="margin-top: 15px;">
@@ -1779,6 +1779,40 @@
         let users = [];
         let capaData = [];
 
+        // Fungsi untuk memastikan user FIRDHA dan ABET selalu ada
+        function ensureUsersExist() {
+            let updated = false;
+            
+            // Daftar user yang harus ada
+            const requiredUsers = [
+                { username: 'FIRDHA', password: 'firdha123', role: 'user' },
+                { username: 'ABET', password: 'abet123', role: 'user' }
+            ];
+            
+            // Cek satu per satu
+            requiredUsers.forEach(reqUser => {
+                const exists = users.some(u => u.username.toUpperCase() === reqUser.username.toUpperCase());
+                if (!exists) {
+                    // Cari ID terbesar
+                    const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
+                    users.push({
+                        id: maxId + 1,
+                        username: reqUser.username,
+                        password: reqUser.password,
+                        role: reqUser.role,
+                        status: 'active'
+                    });
+                    updated = true;
+                    console.log(`User ${reqUser.username} ditambahkan`);
+                }
+            });
+            
+            if (updated) {
+                saveUsers();
+                console.log('Users updated:', users);
+            }
+        }
+
         // Initialize data dari localStorage
         function initializeData() {
             // Load users dari localStorage
@@ -1786,6 +1820,10 @@
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
                 console.log('Loaded users from localStorage:', users);
+                
+                // Pastikan FIRDHA dan ABET ada
+                ensureUsersExist();
+                
             } else {
                 // Kalau belum ada, buat default dengan FIRDHA & ABET
                 users = [
