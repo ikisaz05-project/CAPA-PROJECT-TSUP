@@ -171,6 +171,31 @@
             transform: translateY(-2px);
         }
 
+        /* Tombol Viewer - BARU */
+        .viewer-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .viewer-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
         /* Forgot Password Link */
         .forgot-password {
             text-align: right;
@@ -1262,6 +1287,11 @@
                 
                 <button type="submit" class="login-btn">Login</button>
             </form>
+
+            <!-- TOMBOL VIEWER (BARU) -->
+            <button type="button" class="viewer-btn" onclick="loginAsViewer()">
+                <i class="fas fa-eye"></i> Lanjut sebagai Viewer
+            </button>
             
             <!-- Reset Password Section -->
             <div id="resetSection" class="reset-section">
@@ -1313,13 +1343,13 @@
                         Dashboard
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="inputMenu" style="display: block;">
                     <a href="#" class="nav-link" data-page="input">
                         <i class="fas fa-plus-circle"></i>
                         Input CAPA
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="progressMenu" style="display: block;">
                     <a href="#" class="nav-link" data-page="progress">
                         <i class="fas fa-tasks"></i>
                         Update Progress
@@ -1485,7 +1515,7 @@
                     </div>
                 </div>
 
-                <!-- ===== STATUS CAPA DENGAN PERSENTASE ===== -->
+                <!-- STATUS CAPA DENGAN PERSENTASE -->
                 <div class="status-section">
                     <h3><i class="fas fa-chart-pie" style="margin-right: 10px; color: var(--accent-color);"></i>Status CAPA</h3>
                     
@@ -1783,17 +1813,14 @@
         function ensureUsersExist() {
             let updated = false;
             
-            // Daftar user yang harus ada
             const requiredUsers = [
                 { username: 'FIRDHA', password: 'firdha123', role: 'user' },
                 { username: 'ABET', password: 'abet123', role: 'user' }
             ];
             
-            // Cek satu per satu
             requiredUsers.forEach(reqUser => {
                 const exists = users.some(u => u.username.toUpperCase() === reqUser.username.toUpperCase());
                 if (!exists) {
-                    // Cari ID terbesar
                     const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
                     users.push({
                         id: maxId + 1,
@@ -1809,23 +1836,16 @@
             
             if (updated) {
                 saveUsers();
-                console.log('Users updated:', users);
             }
         }
 
         // Initialize data dari localStorage
         function initializeData() {
-            // Load users dari localStorage
             const savedUsers = localStorage.getItem('capaUsers');
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
-                console.log('Loaded users from localStorage:', users);
-                
-                // Pastikan FIRDHA dan ABET ada
                 ensureUsersExist();
-                
             } else {
-                // Kalau belum ada, buat default dengan FIRDHA & ABET
                 users = [
                     { id: 1, username: 'admin', password: '123456', role: 'admin', status: 'active' },
                     { id: 2, username: 'user', password: 'user123', role: 'user', status: 'active' },
@@ -1833,16 +1853,12 @@
                     { id: 4, username: 'ABET', password: 'abet123', role: 'user', status: 'active' }
                 ];
                 saveUsers();
-                console.log('Created default users with FIRDHA & ABET:', users);
             }
 
-            // Load CAPA data dari localStorage
             const savedData = localStorage.getItem('capaData');
             if (savedData) {
                 capaData = JSON.parse(savedData);
-                console.log('Loaded CAPA data from localStorage:', capaData.length, 'records');
             } else {
-                // Kalau belum ada, buat default
                 capaData = [
                     {
                         id: 1,
@@ -1898,23 +1914,17 @@
                     }
                 ];
                 saveCapaData();
-                console.log('Created default CAPA data:', capaData.length, 'records');
             }
         }
 
-        // Panggil initialize
         initializeData();
 
-        // Save users to localStorage
         function saveUsers() {
             localStorage.setItem('capaUsers', JSON.stringify(users));
-            console.log('Users saved to localStorage');
         }
 
-        // Save CAPA data to localStorage
         function saveCapaData() {
             localStorage.setItem('capaData', JSON.stringify(capaData));
-            console.log('CAPA data saved to localStorage');
         }
 
         let currentUser = null;
@@ -1927,20 +1937,16 @@
             month: 'all'
         };
 
-        // Show loading spinner
         function showLoading() {
             document.getElementById('loadingSpinner').style.display = 'block';
         }
 
-        // Hide loading spinner
         function hideLoading() {
             document.getElementById('loadingSpinner').style.display = 'none';
         }
 
-        // Update datetime every second
         function updateDateTime() {
             const now = new Date();
-            
             const dateStr = now.toLocaleDateString('id-ID', {
                 day: '2-digit',
                 month: '2-digit',
@@ -1960,7 +1966,41 @@
 
         setInterval(updateDateTime, 1000);
 
-        // FUNGSI RESET PASSWORD
+        // FUNGSI LOGIN VIEWER (BARU)
+        function loginAsViewer() {
+            showLoading();
+            
+            setTimeout(() => {
+                currentUser = {
+                    id: 999,
+                    username: 'VIEWER',
+                    role: 'viewer',
+                    status: 'active'
+                };
+                
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    id: 999,
+                    username: 'VIEWER',
+                    role: 'viewer'
+                }));
+                
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('app').classList.add('active');
+                document.getElementById('currentUser').textContent = 'VIEWER (Viewer)';
+                
+                // Sembunyikan menu yang gak boleh diakses viewer
+                document.getElementById('inputMenu').style.display = 'none';
+                document.getElementById('progressMenu').style.display = 'none';
+                document.getElementById('adminMenu').style.display = 'none';
+                
+                updateMachineFilter();
+                applyFilters();
+                renderTables();
+                
+                hideLoading();
+            }, 500);
+        }
+
         function showResetSection() {
             document.getElementById('resetSection').classList.add('active');
         }
@@ -1978,7 +2018,6 @@
                     if (admin) {
                         admin.password = '123456';
                         saveUsers();
-                        hideLoading();
                         alert('✅ Password Admin telah direset ke 123456');
                     }
                 } else if (role === 'user') {
@@ -1986,7 +2025,6 @@
                     if (user) {
                         user.password = 'user123';
                         saveUsers();
-                        hideLoading();
                         alert('✅ Password User telah direset ke user123');
                     }
                 } else if (role === 'firdha') {
@@ -1994,7 +2032,6 @@
                     if (firdha) {
                         firdha.password = 'firdha123';
                         saveUsers();
-                        hideLoading();
                         alert('✅ Password FIRDHA telah direset ke firdha123');
                     }
                 } else if (role === 'abet') {
@@ -2002,12 +2039,12 @@
                     if (abet) {
                         abet.password = 'abet123';
                         saveUsers();
-                        hideLoading();
                         alert('✅ Password ABET telah direset ke abet123');
                     }
                 }
                 
                 hideResetSection();
+                hideLoading();
             }, 500);
         }
 
@@ -2020,10 +2057,6 @@
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
 
-            console.log('Login attempt:', username, password, role);
-            console.log('Available users:', users);
-
-            // Cari user di database (case insensitive untuk username)
             const user = users.find(u => 
                 u.username.toUpperCase() === username.toUpperCase() && 
                 u.password === password && 
@@ -2035,10 +2068,8 @@
                 hideLoading();
                 
                 if (user) {
-                    console.log('Login success:', user);
                     currentUser = user;
                     
-                    // Simpan ke sessionStorage
                     sessionStorage.setItem('currentUser', JSON.stringify({
                         id: user.id,
                         username: user.username,
@@ -2051,8 +2082,12 @@
                     
                     if (user.role === 'admin') {
                         document.getElementById('adminMenu').style.display = 'block';
-                    } else {
+                        document.getElementById('inputMenu').style.display = 'block';
+                        document.getElementById('progressMenu').style.display = 'block';
+                    } else if (user.role === 'user') {
                         document.getElementById('adminMenu').style.display = 'none';
+                        document.getElementById('inputMenu').style.display = 'block';
+                        document.getElementById('progressMenu').style.display = 'block';
                     }
                     
                     updateMachineFilter();
@@ -2061,13 +2096,11 @@
                     renderUsersTable();
                     updateDateTime();
                 } else {
-                    console.log('Login failed: user not found');
                     alert('Username atau password salah!\n\nGunakan fitur "Lupa Password" jika lupa password.');
                 }
             }, 500);
         });
 
-        // Cek sessionStorage saat halaman dimuat
         function checkSavedSession() {
             const savedUser = sessionStorage.getItem('currentUser');
             if (savedUser) {
@@ -2081,8 +2114,12 @@
                     
                     if (currentUser.role === 'admin') {
                         document.getElementById('adminMenu').style.display = 'block';
-                    } else {
+                        document.getElementById('inputMenu').style.display = 'block';
+                        document.getElementById('progressMenu').style.display = 'block';
+                    } else if (currentUser.role === 'user') {
                         document.getElementById('adminMenu').style.display = 'none';
+                        document.getElementById('inputMenu').style.display = 'block';
+                        document.getElementById('progressMenu').style.display = 'block';
                     }
                     
                     updateMachineFilter();
@@ -2096,18 +2133,12 @@
 
         checkSavedSession();
 
-        // Mobile menu toggle
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
             const icon = this.querySelector('i');
-            if (document.getElementById('sidebar').classList.contains('active')) {
-                icon.className = 'fas fa-times';
-            } else {
-                icon.className = 'fas fa-bars';
-            }
+            icon.className = document.getElementById('sidebar').classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
         });
 
-        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const menuToggle = document.getElementById('menuToggle');
@@ -2120,7 +2151,6 @@
             }
         });
 
-        // Update machine filter options based on selected line
         function updateMachineFilter() {
             const lineFilter = document.getElementById('filterLine').value;
             const machineSelect = document.getElementById('filterMachine');
@@ -2140,24 +2170,14 @@
             ).join('');
         }
 
-        // Filter functions
         function getFilteredData() {
             return capaData.filter(item => {
-                if (currentFilters.line !== 'all' && item.line !== currentFilters.line) {
-                    return false;
-                }
-                
-                if (currentFilters.machine !== 'all' && item.machine !== currentFilters.machine) {
-                    return false;
-                }
-                
+                if (currentFilters.line !== 'all' && item.line !== currentFilters.line) return false;
+                if (currentFilters.machine !== 'all' && item.machine !== currentFilters.machine) return false;
                 if (currentFilters.month !== 'all') {
                     const itemMonth = item.date.split('-')[1];
-                    if (itemMonth !== currentFilters.month) {
-                        return false;
-                    }
+                    if (itemMonth !== currentFilters.month) return false;
                 }
-                
                 return true;
             });
         }
@@ -2189,7 +2209,6 @@
             renderTables();
         }
 
-        // Theme Toggle
         function toggleTheme() {
             const html = document.documentElement;
             const themeIcon = document.querySelector('.theme-toggle i');
@@ -2207,11 +2226,17 @@
             updateCharts();
         }
 
-        // Navigation
+        // Navigation dengan proteksi untuk viewer
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 const page = this.dataset.page;
+                
+                // CEK AKSES UNTUK VIEWER
+                if (currentUser?.role === 'viewer' && (page === 'input' || page === 'progress' || page === 'users')) {
+                    alert('Maaf, viewer hanya bisa melihat dashboard!');
+                    return;
+                }
                 
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
@@ -2240,7 +2265,6 @@
             });
         });
 
-        // Form Input CAPA
         document.getElementById('capaForm').addEventListener('submit', function(e) {
             e.preventDefault();
             showLoading();
@@ -2266,19 +2290,17 @@
                 resetForm();
                 hideLoading();
                 alert('Data berhasil disimpan!');
-                
                 document.querySelector('[data-page="dashboard"]').click();
             }, 500);
         });
 
-        // Reset Form
         function resetForm() {
             document.getElementById('capaForm').reset();
             document.getElementById('date').valueAsDate = new Date();
             document.getElementById('dueDate').valueAsDate = new Date(new Date().setDate(new Date().getDate() + 7));
         }
 
-        // Render Tables
+        // Render Tables dengan penyesuaian untuk viewer
         function renderTables() {
             const tableBody = document.getElementById('tableBody');
             const progressBody = document.getElementById('progressTableBody');
@@ -2308,6 +2330,7 @@
                     progressBarClass = 'pending';
                 }
                 
+                // Tabel Dashboard dengan Progress Bar
                 tableHtml += `
                     <tr>
                         <td>${item.line}</td>
@@ -2329,12 +2352,15 @@
                             ${currentUser?.role === 'admin' ? 
                                 `<button class="action-btn" onclick="editData(${item.id})"><i class="fas fa-edit"></i></button>
                                  <button class="action-btn" onclick="deleteData(${item.id})"><i class="fas fa-trash"></i></button>` : 
+                                currentUser?.role === 'viewer' ?
+                                `<button class="action-btn" onclick="viewData(${item.id})"><i class="fas fa-eye"></i></button>` :
                                 `<button class="action-btn" onclick="viewData(${item.id})"><i class="fas fa-eye"></i></button>`
                             }
                         </td>
                     </tr>
                 `;
                 
+                // Tabel Progress
                 progressHtml += `
                     <tr>
                         <td>${item.line}</td>
@@ -2374,7 +2400,6 @@
             updateCharts();
         }
 
-        // Render Users Table
         function renderUsersTable() {
             const usersBody = document.getElementById('usersTableBody');
             if (!usersBody) return;
@@ -2401,7 +2426,6 @@
             usersBody.innerHTML = usersHtml;
         }
 
-        // User Management Functions
         function openUserModal(userId = null) {
             editingUserId = userId;
             const modal = document.getElementById('userModal');
@@ -2502,7 +2526,6 @@
             }
         }
 
-        // Update Dashboard Stats
         function updateDashboard() {
             const filteredData = getFilteredData();
             
@@ -2522,7 +2545,6 @@
             document.getElementById('overdueCapa').textContent = overdue;
             document.getElementById('closedPercentage').textContent = total > 0 ? Math.round((closed/total)*100) + '%' : '0%';
             
-            // Update STATUS CARDS dengan PERSENTASE
             document.getElementById('closedCount').textContent = closed;
             document.getElementById('pendingCount').textContent = pending;
             document.getElementById('overdueCount').textContent = overdue;
@@ -2558,7 +2580,6 @@
             updateCharts();
         }
 
-        // Charts
         function updateCharts() {
             const filteredData = getFilteredData();
             
@@ -2644,7 +2665,6 @@
             }
         }
 
-        // Export functions
         function exportToPDF() {
             showLoading();
             
@@ -2711,7 +2731,6 @@
             exportToPDF();
         }
 
-        // Modal functions
         function openUpdateModal(id) {
             const item = capaData.find(i => i.id === id);
             if (item) {
@@ -2754,7 +2773,6 @@
             }, 500);
         });
 
-        // CRUD operations
         function editData(id) {
             const item = capaData.find(i => i.id === id);
             if (item && currentUser?.role === 'admin') {
@@ -2793,7 +2811,6 @@
             }
         }
 
-        // Logout
         function logout() {
             if (confirm('Yakin ingin logout?')) {
                 sessionStorage.removeItem('currentUser');
@@ -2804,19 +2821,16 @@
             }
         }
 
-        // Event listener untuk filter line
         document.getElementById('filterLine').addEventListener('change', function() {
             updateMachineFilter();
         });
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             resetForm();
             document.documentElement.setAttribute('data-theme', 'light');
             updateDateTime();
         });
 
-        // Handle window resize
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
                 document.getElementById('sidebar').classList.remove('active');
@@ -2824,7 +2838,6 @@
             }
         });
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const updateModal = document.getElementById('updateModal');
             const userModal = document.getElementById('userModal');
